@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registered Students</title>
+    <link rel="stylesheet" href="output.css">
+
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <header class="text-center bg-blue-200  py-6 shadow-md">
+        <h1 class="text-4xl font-bold tracking-wide">Registered Students</h1>
+        <p class="text-lg mt-2 max-w-2xl mx-auto px-4">
+            View, edit, or delete student registration records stored in the system.
+            This section displays all registered students with their essential details.
+        </p>
+    </header>
+    <main>
+        <section class="px-1 sm:px-2 lg:px-4  mt-8">
+            <div class="overflow-x-auto bg-white shadow-lg rounded-lg border border-gray-200">
+                <table class="min-w-full  text-center">
+                    <thead class="bg-gray-500 text-white uppercase text-sm">
+                        <tr>
+                            <th class="py-2 px-2">Student ID</th>
+                            <th class="py-2 px-2">Name</th>
+                            <th class="py-2 px-2">Email</th>
+                            <th class="py-2 px-2">Contact No</th>
+                            <th class="py-2 px-2">Class</th>
+                            <th class="py-2 px-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class=" text-gray-700">
+                        <!-- Example static row -->
+                        
+                        <!-- Dynamic records will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+    <script src="students.js"></script>
+</body>
+
+</html>
