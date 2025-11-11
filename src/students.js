@@ -1,121 +1,195 @@
+const tableBody = document.getElementById('studentsTableBody');
+const tableWrapper = document.getElementById('tableWrapper');
 
-// -------------------------------------------------------
-// For displaying students on Students.html
-// -------------------------------------------------------
-const raw = localStorage.getItem('students');
-const students = raw ? JSON.parse(raw) : [];
-function displayStudents() {
-
-    const tableBody = document.querySelector('tbody');
-    if (!tableBody) return;
-    tableBody.innerHTML = ''; // clear existing rows
-
-    if (students.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-gray-500 italic">No students registered yet.</td></tr>`;
-        return;
-    }
-
-    students.forEach((student) => {
-        const row = `
-      <tr class="hover:bg-gray-100 transition duration-300 border border-gray-200">
-        <td class="py-3 px-2 font-medium">${student.studentId}</td>
-        <td class="py-3 px-2">${student.name}</td>
-        <td class="py-3 px-2">${student.email}</td>
-        <td class="py-3 px-2">${student.contact}</td>
-        <td class="py-3 px-2">${student.class}</td>
-        <td class="py-3 px-2 space-x-2">
-          <button onclick="editStudent('${student.studentId}')" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-2 rounded-lg shadow-sm">Edit</button>
-          <button onclick="deleteStudent('${student.studentId}')" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded-lg shadow-sm">Delete</button>
-        </td>
-      </tr>
-    `;
-        tableBody.insertAdjacentHTML('beforeend', row);
-    });
-}
-
-
-displayStudents();
-function deleteStudent(studentId) {
-    const idx = students.some((s => s.studentId === studentId))
-    if (!idx) {
-        alert("Student not found!");
-        return;
-    } else {
-        const updated = students.filter(s => s.studentId !== studentId)
-        localStorage.setItem('students', JSON.stringify(updated));
-        alert("Student deleted successfully!");
-        location.reload();
-    }
-    displayStudents();
-}
-
-function editStudent(studentId) {
-  console.log("Edit clicked for:", studentId);
-
-  const raw = localStorage.getItem('students');
-  let students = raw ? JSON.parse(raw) : [];
-
-  const student = students.find(s => s.studentId === studentId);
-  if (!student) {
-    alert("Student not found!");
-    return;
-  }
-
-  // find the table row
-  const row = Array.from(document.querySelectorAll('tbody tr')).find(r =>
-    r.querySelector('td')?.textContent === studentId
-  );
-
-  if (!row) return;
-
-  // replace row with editable inputs
-  row.innerHTML = `
-    <td class="py-3 px-2 font-medium">${student.studentId}</td>
-    <td class="py-3 px-2"><input type="text" value="${student.name}" class="border rounded p-1 w-full"></td>
-    <td class="py-3 px-2"><input type="email" value="${student.email}" class="border rounded p-1 w-full"></td>
-    <td class="py-3 px-2"><input type="tel" value="${student.contact}" class="border rounded p-1 w-full"></td>
-    <td class="py-3 px-2">
-      <select class="border rounded p-1 w-full">
-        <option value="11th" ${student.class === '11th' ? 'selected' : ''}>11th</option>
-        <option value="12th" ${student.class === '12th' ? 'selected' : ''}>12th</option>
-      </select>
-    </td>
-    <td class="py-3 px-2 space-x-2">
-      <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded" id="saveBtn">Save</button>
-      <button class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-1 px-2 rounded" id="cancelBtn">Cancel</button>
-    </td>
-  `;
-
-  // ✅ handle save
-  row.querySelector('#saveBtn').addEventListener('click', () => {
-    const updated = {
-      studentId: student.studentId, 
-      name: row.querySelector('input[type="text"]').value.trim(),
-      email: row.querySelector('input[type="email"]').value.trim(),
-      contact: row.querySelector('input[type="tel"]').value.trim(),
-      class: row.querySelector('select').value,
-      gender:student.gender
-    };
-
-    if (!updated.name || !updated.email || !updated.contact) {
-      alert("All fields are required!");
-      return;
-    }
-
-    // replace in localStorage
-    students = students.map(s =>
-      s.studentId === studentId ? updated : s
-    );
-
-    localStorage.setItem('students', JSON.stringify(students));
-    alert("Student updated successfully!");
+// Function to display all students
+function showStudents() {
+    let studentsData = localStorage.getItem('students');
+    let students = studentsData ? JSON.parse(studentsData) : [];
     
-    displayStudents();
-    document.location.reload();
-  });
-
-  // ✅ handle cancel
-  row.querySelector('#cancelBtn').addEventListener('click', () => {
-    displayStudents(); // reload the table view
-  });
+    tableBody.innerHTML = '';
+    
+    if (students.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                    <p class="text-lg">No students registered yet.</p>
+                    <a href="index.html" class="text-purple-600 underline">Register students here</a>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    students.forEach((student) => {
+        let row = `
+            <tr class="hover:bg-purple-50">
+                <td class="px-3 py-4 text-center">${student.studentId}</td>
+                <td class="px-3 py-4 text-center">${student.name}</td>
+                <td class="px-3 py-4 text-center">${student.email}</td>
+                <td class="px-3 py-4 text-center">${student.contact}</td>
+                <td class="px-3 py-4 text-center">${student.class}</td>
+                <td class="px-3 py-4 text-center">${student.gender}</td>
+                <td class="px-3 py-4 text-center space-x-2">
+                    <button onclick="editStudent('${student.studentId}')" 
+                            class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg">
+                        Edit
+                    </button>
+                    <button onclick="deleteStudent('${student.studentId}')" 
+                            class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+        
+        tableBody.innerHTML += row;
+    });
+    
+    if (students.length > 5) {
+        tableWrapper.style.maxHeight = '60vh';
+        tableWrapper.style.overflowY = 'scroll';
+        console.log('Scrollbar added - more than 5 students');
+    } else {
+        tableWrapper.style.maxHeight = 'none';
+        tableWrapper.style.overflowY = 'visible';
+    }
 }
+
+// Function to delete a student
+function deleteStudent(studentId) {
+    let confirmDelete = confirm('Are you sure you want to delete this student?');
+    
+    if (!confirmDelete) {
+        return;  
+    }
+    let studentsData = localStorage.getItem('students');
+    let students = studentsData ? JSON.parse(studentsData) : [];
+    
+    let updatedStudents = students.filter((student) => student.studentId !== studentId);
+    
+    localStorage.setItem('students', JSON.stringify(updatedStudents));
+    
+    alert('Student deleted successfully!');
+    showStudents();
+}
+
+// Function to edit a student
+function editStudent(studentId) {
+    let studentsData = localStorage.getItem('students');
+    let students = studentsData ? JSON.parse(studentsData) : [];
+    let student = students.find((s) => s.studentId === studentId);
+    
+    if (!student) {
+        alert('Student not found!');
+        return;
+    }
+    let allRows = tableBody.querySelectorAll('tr');
+    let rowToEdit = Array.from(allRows).find((row) => {
+        let firstCell = row.querySelector('td');
+        return firstCell && firstCell.textContent === studentId;
+    });
+    
+    if (!rowToEdit) return;
+    rowToEdit.innerHTML = `
+        <td class="px-3 py-4 text-center font-bold">${student.studentId}</td>
+        <td class="px-3 py-4">
+            <input type="text" value="${student.name}" 
+                   id="edit-name-${studentId}"
+                   class="w-full px-3 py-2 border-2 border-purple-400 rounded-lg text-center">
+        </td>
+        <td class="px-3 py-4">
+            <input type="email" value="${student.email}" 
+                   id="edit-email-${studentId}"
+                   class="w-full px-3 py-2 border-2 border-purple-400 rounded-lg text-center">
+        </td>
+        <td class="px-3 py-4">
+            <input type="tel" value="${student.contact}" 
+                   id="edit-contact-${studentId}"
+                   class="w-full px-3 py-2 border-2 border-purple-400 rounded-lg text-center">
+        </td>
+        <td class="px-3 py-4">
+            <select id="edit-class-${studentId}"
+                    class="w-full px-3 py-2 border-2 border-purple-400 rounded-lg text-center">
+                <option value="11th" ${student.class === '11th' ? 'selected' : ''}>11th</option>
+                <option value="12th" ${student.class === '12th' ? 'selected' : ''}>12th</option>
+            </select>
+        </td>
+        <td class="px-3 py-4">
+            <select id="edit-gender-${studentId}"
+                    class="w-full px-3 py-2 border-2 border-purple-400 rounded-lg text-center">
+                <option value="Male" ${student.gender === 'Male' ? 'selected' : ''}>Male</option>
+                <option value="Female" ${student.gender === 'Female' ? 'selected' : ''}>Female</option>
+                <option value="Other" ${student.gender === 'Other' ? 'selected' : ''}>Other</option>
+            </select>
+        </td>
+        <td class="px-3 py-4 text-center space-x-2">
+            <button onclick="saveStudent('${studentId}')" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">
+                Save
+            </button>
+            <button onclick="showStudents()" 
+                    class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg">
+                Cancel
+            </button>
+        </td>
+    `;
+}
+
+//Function to save edited student
+function saveStudent(studentId) {
+    let newName = document.getElementById('edit-name-' + studentId).value.trim();
+    let newEmail = document.getElementById('edit-email-' + studentId).value.trim();
+    let newContact = document.getElementById('edit-contact-' + studentId).value.trim();
+    let newClass = document.getElementById('edit-class-' + studentId).value;
+    let newGender = document.getElementById('edit-gender-' + studentId).value;
+    
+    let namePattern = /^[A-Za-z\s]+$/;
+    let emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    let contactPattern = /^\d{10,15}$/;
+    
+    if (newName === '') {
+        alert('Name cannot be empty!');
+        return;
+    }
+    if (!namePattern.test(newName)) {
+        alert('Name should contain only letters!');
+        return;
+    }
+    if (newEmail === '') {
+        alert('Email cannot be empty!');
+        return;
+    }
+    if (!emailPattern.test(newEmail)) {
+        alert('Please enter a valid email!');
+        return;
+    }
+    if (newContact === '') {
+        alert('Contact cannot be empty!');
+        return;
+    }
+    if (!contactPattern.test(newContact)) {
+        alert('Contact must be 10-15 digits!');
+        return;
+    }
+    
+    let studentsData = localStorage.getItem('students');
+    let students = studentsData ? JSON.parse(studentsData) : [];
+    
+    let studentIndex = students.findIndex((s) => s.studentId === studentId);
+    if (studentIndex !== -1) {
+        students[studentIndex].name = newName;
+        students[studentIndex].email = newEmail;
+        students[studentIndex].contact = newContact;
+        students[studentIndex].class = newClass;
+        students[studentIndex].gender = newGender;
+    }
+    
+    localStorage.setItem('students', JSON.stringify(students));
+    
+    alert('Student updated successfully!');
+    
+    showStudents();
+}
+
+
+showStudents();

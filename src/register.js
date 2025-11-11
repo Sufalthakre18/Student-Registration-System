@@ -1,71 +1,130 @@
-let form = document.querySelector('form')
-let nameInput = document.getElementById('name')
-let idInput = document.getElementById('studentId')
-let emailInput = document.getElementById('email')
-let contactInput = document.getElementById('tel')
-let selectClass = document.getElementById('class')
+//  Get all form elements
+const form = document.getElementById('registrationForm');
+const nameInput = document.getElementById('name');
+const idInput = document.getElementById('studentId');
+const emailInput = document.getElementById('email');
+const contactInput = document.getElementById('contact');
+const classSelect = document.getElementById('class');
 
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    let data = {};
-    const reId = /^\d+$/;
-    const reContact = /^\d{10,15}$/;
-    const reEmail = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    let valid = true;
+//  Validation patterns (Regular Expressions)
+const namePattern = /^[A-Za-z\s]+$/;        
+const idPattern = /^\d+$/;                 
+const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;  
+const contactPattern = /^\d{10,15}$/;       
 
-    if (nameInput.value.trim() === '') {
-        alert("Name cannot be empty");
-        valid = false;
-    } else {
-        data.name = nameInput.value.trim();
+// Form Submit Event
+form.addEventListener('submit', function(e) {
+    e.preventDefault();  
+    
+    //  input values
+    let name = nameInput.value.trim();
+    let studentId = idInput.value.trim();
+    let email = emailInput.value.trim();
+    let contact = contactInput.value.trim();
+    let studentClass = classSelect.value;
+    let gender = document.querySelector('input[name="gender"]:checked');
+    
+    // Clear previous error messages
+    document.getElementById('nameError').textContent = '';
+    document.getElementById('idError').textContent = '';
+    document.getElementById('emailError').textContent = '';
+    document.getElementById('contactError').textContent = '';
+    document.getElementById('classError').textContent = '';
+    document.getElementById('genderError').textContent = '';
+    
+    let isValid = true;  
+    
+    // Validate Name (only letters and spaces)
+    if (name === '') {
+        document.getElementById('nameError').textContent = 'Name cannot be empty';
+        isValid = false;
+    } else if (!namePattern.test(name)) {
+        document.getElementById('nameError').textContent = 'Name should contain only letters';
+        isValid = false;
     }
-    if (!reId.test(idInput.value.trim())) {
-        alert("Student ID must be numeric");
-        valid = false;
-    } else {
-        data.studentId = idInput.value.trim();
+    
+    // Validate Student ID (only numbers)
+    if (studentId === '') {
+        document.getElementById('idError').textContent = 'Student ID cannot be empty';
+        isValid = false;
+    } else if (!idPattern.test(studentId)) {
+        document.getElementById('idError').textContent = 'Student ID must be numbers only';
+        isValid = false;
     }
-    if (!reEmail.test(emailInput.value.trim())) {
-        alert("Invalid Email format");
-        valid = false;
-    } else {
-        data.email = emailInput.value.trim();
+    
+    // Validate email
+    if (email === '') {
+        document.getElementById('emailError').textContent = 'Email cannot be empty';
+        isValid = false;
+    } else if (!emailPattern.test(email)) {
+        document.getElementById('emailError').textContent = 'Please enter a valid email';
+        isValid = false;
     }
-    if (!reContact.test(contactInput.value.trim())) {
-        alert("Contact number must be 10 to 15 digits");
-        valid = false;
-    } else {
-        data.contact = contactInput.value.trim();
+    
+    // Validate Contact (10-15 digits)
+    if (contact === '') {
+        document.getElementById('contactError').textContent = 'Contact cannot be empty';
+        isValid = false;
+    } else if (!contactPattern.test(contact)) {
+        document.getElementById('contactError').textContent = 'Contact must be 10-15 digits';
+        isValid = false;
     }
-    if (!selectClass.value) {
-        alert("Please select your class");
-        valid = false;
-    } else {
-        data.class = selectClass.value;
+    
+    // Validate Class Selection
+    if (studentClass === '' || studentClass === null) {
+        document.getElementById('classError').textContent = 'Please select a class';
+        isValid = false;
     }
-
-    let genderInput = document.querySelector('input[name="gender"]:checked');
-    if (!genderInput) {
-        alert("Please select your gender");
-        valid = false;
-    } else {
-        data.gender = genderInput.value;
+    
+    // Validate Gender Selection
+    if (!gender) {
+        document.getElementById('genderError').textContent = 'Please select a gender';
+        isValid = false;
     }
-    if (!valid) return;
-
-    const raw = localStorage.getItem('students'); // store under 'students'
-    const students = raw ? JSON.parse(raw) : [];
-
-    const exists = students.some(s => s.studentId === data.studentId);
-    if (exists) {
-        alert("Student ID already exists!");
+    
+    if (!isValid) {
+        alert('Please fix the errors in the form');
         return;
     }
-
-    students.push(data);
-    localStorage.setItem('students', JSON.stringify(students));
-    console.log("Saved student:", data);
-    alert("Student registered successfully!");
+    
+    // Check for duplicate Student ID
+    let existingStudents = localStorage.getItem('students');
+    let studentsArray = existingStudents ? JSON.parse(existingStudents) : [];
+    
+    let isDuplicate = studentsArray.some(student => student.studentId === studentId);
+    
+    if (isDuplicate) {
+        document.getElementById('idError').textContent = 'This Student ID already exists';
+        alert('Student ID already registered!');
+        return;
+    }
+    
+    // Create student object
+    let newStudent = {
+        name: name,
+        studentId: studentId,
+        email: email,
+        contact: contact,
+        class: studentClass,
+        gender: gender.value
+    };
+    
+    studentsArray.push(newStudent);
+    localStorage.setItem('students', JSON.stringify(studentsArray));
+    
     form.reset();
+    
+    console.log('New student added:', newStudent);
+});
 
-})
+// error on input fields
+const inputs = [nameInput, idInput, emailInput, contactInput];
+const errorIds = ['nameError', 'idError', 'emailError', 'contactError'];
+
+inputs.forEach((input, index) => {
+    input.addEventListener('input', function() {
+        document.getElementById(errorIds[index]).textContent = '';
+    });
+});
+
+console.log('Registration form ready!');
