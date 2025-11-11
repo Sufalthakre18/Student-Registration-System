@@ -30,17 +30,7 @@ This project is a comprehensive student management system built with **HTML**, *
 - ✅ **Dynamic Scrollbar** - Automatically added via JavaScript when more than 5 records exist
 - ✅ **Accessible** - Semantic HTML tags and proper structure
 
-## 📁 File Structure
 
-```
-student-registration-system/
-│
-├── index.html          # Main registration form page
-├── students.html       # Student records display page
-├── register.js         # Registration form logic and validation
-├── students.js         # Display, edit, and delete functionality
-└── README.md          # Project documentation (this file)
-```
 
 ## 💻 Usage Guide
 
