@@ -7,6 +7,7 @@ A fully responsive web-based student registration system built with **Tailwind C
 This project is a comprehensive student management system built with **HTML**, **Tailwind CSS**, and **JavaScript**. It provides an intuitive interface for managing student information including name, student ID, email, contact number, class, and gender.
 
 ## Github link [link](https://github.com/Sufalthakre18/Student-Registration-System)
+## Live 🔗 [Live-Project](https://student-registration-system-one-sandy.vercel.app/index.html)
 
 ## ✨ Features
 
